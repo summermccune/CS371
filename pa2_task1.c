@@ -43,9 +43,6 @@ int server_port = 12345;
 int num_client_threads = DEFAULT_CLIENT_THREADS;
 long num_requests = 1000000;  // Total number of requests per client thread
 
-/*
- * Extended structure to track per-thread data and packet counts.
- */
 typedef struct {
     int epoll_fd;         /* File descriptor for the epoll instance */
     int socket_fd;        /* UDP socket file descriptor */
@@ -58,8 +55,6 @@ typedef struct {
 
 /*
  * UDP-based Stop-and-Wait client thread function.
- * Each thread sends MESSAGE_SIZE bytes to the server, waits for the echo response using epoll,
- * and tracks the round-trip time along with packet transmission and loss.
  */
 void *client_thread_func(void *arg) {
     client_thread_data_t *data = (client_thread_data_t *)arg;
@@ -141,10 +136,6 @@ void *client_thread_func(void *arg) {
     pthread_exit(NULL);
 }
 
-/*
- * run_client() creates multiple client threads, where each thread sets up its UDP socket and epoll instance.
- * It then aggregates performance metrics including RTT, request rate, and counts for transmitted and received packets.
- */
 void run_client() {
     pthread_t threads[num_client_threads];
     client_thread_data_t thread_data[num_client_threads];
@@ -227,8 +218,6 @@ void run_client() {
 
 /*
  * UDP-based server function.
- * The server binds to the given IP address and port, then enters a continuous event loop using epoll.
- * It uses recvfrom() to receive packets from clients, and sends the exact same payload back using sendto().
  */
 void run_server() {
     int server_sock;
@@ -318,12 +307,6 @@ void run_server() {
     close(epoll_fd);
 }
 
-/*
- * Main entry point.
- * Usage:
- *   ./udp_app server [server_ip server_port]
- *   ./udp_app client [server_ip server_port num_client_threads num_requests]
- */
 int main(int argc, char *argv[]) {
     if (argc > 1 && strcmp(argv[1], "server") == 0) {
         if (argc > 2) server_ip = argv[2];
